@@ -1,7 +1,9 @@
 package com.failall.armageddon.block.entity;
 
 import com.failall.armageddon.Armageddon;
+import com.failall.armageddon.recipe.AltarRecipe;
 import com.failall.armageddon.screen.AltarMenu;
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -25,13 +28,15 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public class AltarBlockEntity extends BlockEntity implements MenuProvider {
 
     protected final ContainerData data;
     private int progress = 0;
-    private int maxProgress = 60;
+    private int maxProgress = 20;
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(10) {
+    private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
@@ -130,10 +135,14 @@ public class AltarBlockEntity extends BlockEntity implements MenuProvider {
 
             if (pEntity.progress >= pEntity.maxProgress) {
                 craftResult(pEntity);
+                setChanged(level, pos, state);
             }
         }
-        pEntity.resetProgress();
-        setChanged(level, pos, state);
+        else {
+            pEntity.resetProgress();
+            setChanged(level, pos, state);
+        }
+
     }
 
     private void resetProgress() {
@@ -141,23 +150,26 @@ public class AltarBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private static void craftResult(AltarBlockEntity pEntity) {
-        // Level level = pEntity.level;
-        // SimpleContainer inventory = new SimpleContainer(pEntity.itemHandler.getSlots());
-        // for (int i = 0; i < pEntity.itemHandler.getSlots(); i++) {
-        //     inventory.setItem(i, pEntity.itemHandler.getStackInSlot(i));
-        // }
+        Level level = pEntity.level;
+        SimpleContainer inventory = new SimpleContainer(pEntity.itemHandler.getSlots());
 
-        // Optional<GemInfusingStationRecipe> recipe = level.getRecipeManager()
-        //         .getRecipeFor(GemInfusingStationRecipe.Type.INSTANCE, inventory, level);
+        for (int i = 0; i < pEntity.itemHandler.getSlots(); i++) {
+            inventory.setItem(i, pEntity.itemHandler.getStackInSlot(i));
+        }
 
-        // if(hasRecipe(pEntity)) {
-        //     pEntity.FLUID_TANK.drain(recipe.get().getFluid().getAmount(), IFluidHandler.FluidAction.EXECUTE);
-        //     pEntity.itemHandler.extractItem(1, 1, false);
-        //     pEntity.itemHandler.setStackInSlot(2, new ItemStack(recipe.get().getResultItem().getItem(),
-        //             pEntity.itemHandler.getStackInSlot(2).getCount() + 1));
+        Optional<AltarRecipe> recipe = level.getRecipeManager()
+                .getRecipeFor(AltarRecipe.Type.INSTANCE, inventory, level);
 
-        //     pEntity.resetProgress();
-        //  }
+            if (hasRecipe(pEntity)) {
+                //pEntity.FLUID_TANK.drain(recipe.get().getFluid().getAmount(), IFluidHandler.FluidAction.EXECUTE);
+                for (int i = 0; i < inventory.getContainerSize() - 1; i++) {
+                    pEntity.itemHandler.extractItem(i, 1, false);
+                }
+                pEntity.itemHandler.setStackInSlot(8, new ItemStack(recipe.get().getResultItem().getItem(),
+                        pEntity.itemHandler.getStackInSlot(8).getCount() + 1));
+
+                pEntity.resetProgress();
+            }
     }
 
     private static boolean hasRecipe(AltarBlockEntity entity) {
@@ -167,14 +179,12 @@ public class AltarBlockEntity extends BlockEntity implements MenuProvider {
             inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
         }
 
-        //  Optional<AltarBlockEntity> recipe = level.getRecipeManager()
-        //          .getRecipeFor(AltarBlockEntity.Type.INSTANCE, inventory, level);
+          Optional<AltarRecipe> recipe = level.getRecipeManager()
+                  .getRecipeFor(AltarRecipe.Type.INSTANCE, inventory, level);
 
-
-        //   return recipe.isPresent() && canInsertAmountIntoOutputSlot(inventory) &&
-        //           canInsertItemIntoOutputSlot(inventory, recipe.get().getResultItem())
-        //           && hasCorrectFluidInTank(entity, recipe) && hasCorrectFluidAmountInTank(entity, recipe);
-        return true;
+        return recipe.isPresent() && canInsertAmountIntoOutputSlot(inventory) &&
+                   canInsertItemIntoOutputSlot(inventory, recipe.get().getResultItem());
+                  // && hasCorrectFluidInTank(entity, recipe) && hasCorrectFluidAmountInTank(entity, recipe);
     }
 
     // private static boolean hasCorrectFluidAmountInTank(AltarBlockEntity entity, Optional<AltarBlockEntity> recipe) {
@@ -186,10 +196,10 @@ public class AltarBlockEntity extends BlockEntity implements MenuProvider {
     // }
 
     private static boolean canInsertItemIntoOutputSlot(SimpleContainer inventory, ItemStack stack) {
-        return inventory.getItem(2).getItem() == stack.getItem() || inventory.getItem(2).isEmpty();
+        return inventory.getItem(9).getItem() == stack.getItem() || inventory.getItem(9).isEmpty();
     }
 
     private static boolean canInsertAmountIntoOutputSlot(SimpleContainer inventory) {
-        return inventory.getItem(2).getMaxStackSize() > inventory.getItem(2).getCount();
+        return inventory.getItem(9).getMaxStackSize() > inventory.getItem(9).getCount();
     }
 }
