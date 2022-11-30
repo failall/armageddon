@@ -27,24 +27,24 @@ public class AltarMenu extends AbstractContainerMenu {
     // checkContainerSize must match itemStackHandler size in the block entity
     public AltarMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
         super(ModMenuTypes.ALTAR_MENU.get(), id);
-        checkContainerSize(inv, 10);
+        checkContainerSize(inv, 9);
         this.blockEntity = (AltarBlockEntity) entity;
         this.level = inv.player.level;
         this.data = data;
 
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
+        //GUI slots
         this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-            this.addSlot(new SlotItemHandler(handler, 0, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 1, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 2, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 3, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 4, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 5, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 6, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 7, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 8, 1, 1));
-            this.addSlot(new SlotItemHandler(handler, 9, 1, 1));
+            this.addSlot(new SlotItemHandler(handler, 0, 79, -31));
+            this.addSlot(new SlotItemHandler(handler, 1, 134, -13));
+            this.addSlot(new SlotItemHandler(handler, 2, 152, 33));
+            this.addSlot(new SlotItemHandler(handler, 3, 134, 79));
+            this.addSlot(new SlotItemHandler(handler, 4, 79, 97));
+            this.addSlot(new SlotItemHandler(handler, 5, 26, 79));
+            this.addSlot(new SlotItemHandler(handler, 6, 8, 33));
+            this.addSlot(new SlotItemHandler(handler, 7, 26, -13));
+            this.addSlot(new SlotItemHandler(handler, 8, 79, 33));
         });
         addDataSlots(data);
     }
@@ -65,7 +65,7 @@ public class AltarMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 10;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 9;  // must be the number of slots you have!
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
@@ -109,14 +109,14 @@ public class AltarMenu extends AbstractContainerMenu {
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 86 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 118 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 144));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 176));
         }
     }
 

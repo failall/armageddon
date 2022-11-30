@@ -15,6 +15,10 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu> {
 
     public AltarScreen(AltarMenu menu, Inventory inv, Component component) {
         super(menu, inv, component);
+
+        this.titleLabelY = -38;
+        this.inventoryLabelY = 106;
+
     }
 
     @Override
@@ -27,6 +31,11 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
+
+        int x = (width - 194) / 2;
+        int y = (height - 252) / 2;
+
+        this.blit(stack, x, y,0,0, 194, 252);
     }
 
     @Override
