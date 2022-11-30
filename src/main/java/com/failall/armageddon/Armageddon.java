@@ -2,9 +2,13 @@ package com.failall.armageddon;
 
 import com.failall.armageddon.block.AltarBlock;
 import com.failall.armageddon.block.entity.AltarBlockEntity;
+import com.failall.armageddon.recipe.ModRecipeTypes;
+import com.failall.armageddon.recipe.ModRecipes;
+import com.failall.armageddon.screen.AltarScreen;
 import com.failall.armageddon.screen.ModMenuTypes;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -50,7 +54,7 @@ public class Armageddon
     public static final RegistryObject<Item> ALTAR_BLOCK_ITEM = ITEMS.register("altar", () -> new BlockItem(ALTAR_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public static final RegistryObject<BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY = BLOCK_ENTITES.register(
-            "altar", () -> BlockEntityType.Builder.of(AltarBlockEntity::new,
+            "altar", () -> BlockEntityType.Builder.of((pos, state) -> new AltarBlockEntity(pos, state),
                     Armageddon.ALTAR_BLOCK.get()).build(null)
     );
 
@@ -66,7 +70,12 @@ public class Armageddon
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
 
+        BLOCK_ENTITES.register(modEventBus);
+
         ModMenuTypes.register(modEventBus);
+
+        ModRecipes.register(modEventBus);
+        ModRecipeTypes.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -94,9 +103,7 @@ public class Armageddon
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            MenuScreens.register(ModMenuTypes.ALTAR_MENU.get(), AltarScreen::new);
         }
     }
 }
