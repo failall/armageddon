@@ -2,6 +2,7 @@ package com.failall.armageddon.screen;
 
 import com.failall.armageddon.Armageddon;
 import com.failall.armageddon.block.entity.AltarBlockEntity;
+import com.failall.armageddon.screen.slot.OutputSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -44,7 +45,7 @@ public class AltarMenu extends AbstractContainerMenu {
             this.addSlot(new SlotItemHandler(handler, 5, 26, 79));
             this.addSlot(new SlotItemHandler(handler, 6, 8, 33));
             this.addSlot(new SlotItemHandler(handler, 7, 26, -13));
-            this.addSlot(new SlotItemHandler(handler, 8, 79, 33));
+            this.addSlot(new OutputSlot(handler, 8, 79, 33));
         });
         addDataSlots(data);
     }
@@ -127,7 +128,7 @@ public class AltarMenu extends AbstractContainerMenu {
     public int getScaledProgress() {
         int progress = this.data.get(0);
         int maxProgress = this.data.get(1);  // Max Progress
-        int progressArrowSize = 26; // This is the height in pixels of your arrow
+        int progressArrowSize = 16; // This is the height in pixels of your arrow
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
     }
